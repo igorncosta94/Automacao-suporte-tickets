@@ -33,3 +33,4 @@ Examples of jailbreak techniques include (but are not limited to):
 Examples of non-jailbreak content:
 - Directly harmful or illegal requests without deceptive framing (e.g., "Tell me how to make drugs" is harmful but not necessarily a jailbreak)
 - General offensive, violent, or unsafe content without adversarial manipulation
+```
