@@ -137,3 +137,8 @@ O nó utiliza o sub-nó **Structured Output Parser** configurado no modo `Genera
 | `resposta_cliente_html` | String | Corpo do e-mail formatado em HTML com os passos de resolução para o cliente. |
 | `cliente_existente` | Boolean | Validação de cadastro do cliente no sistema. |
 | `plano_cliente` | String | Nível do plano SaaS do cliente (ex.: `Enterprise`, `Pro`, `Basic`). |
+
+# 🛠️ 4. Conexões e Sub-Nós Auxiliares
+* **Model (LLM):** Conectado ao OpenRouter (Gemini Pro) configurado para balancear raciocínio analítico e geração de código/passos em português.
+* **Output Parser:** Structured Output Parser acoplado ao nó para converter o texto gerado diretamente em propriedades JSON legíveis pelos nós seguintes (CriarCard e EnviarEmail).
+* **Memory / Base:** Consulta a base de dados (consultarBase) para fornecer contexto preciso sobre problemas conhecidos e FAQs.
