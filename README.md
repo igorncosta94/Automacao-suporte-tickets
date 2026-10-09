@@ -29,7 +29,7 @@ Abaixo está o detalhamento de cada nó configurado no n8n e sua função operac
 ---
 
 ### 1. Entrada e Segurança
-* **`NovoTicket` (Webhook):** Ponto de entrada do sistema. Recebe o payload com os dados do chamado enviado pelo cliente (`data`, `nome`, `email`, `empresa`, `assunto`,`mensagem`).
+* **`NovoTicket` (Webhook):** Ponto de entrada do sistema. Recebe o payload com os dados do chamado enviado pelo cliente (`data`, `nome`, `email`, `empresa`, `assunto`,`mensagem`). ![Novo-ticket](assets/NOVOTICKET-WEB.png)
 * **`Verificação` (Guardrail LLM - OpenRouter / Gemini 3.1 Pro):** Avalia a mensagem do cliente em duas camadas de proteção:
   * **Jailbreak Detection:** Identifica tentativas de injeção de prompt ou manipulação do modelo.
   * **Topical Alignment:** Garante que o assunto pertença estritamente ao escopo de suporte do SaaS.
