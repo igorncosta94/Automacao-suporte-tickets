@@ -65,3 +65,14 @@ Tópicos inválidos:
 * **Arquitetura de Guardrails:** Validação de payload em duas etapas (Segurança + Escopo de Negócio).
 * **Engenharia de Prompts:** Prompts estruturados baseados em papéis (Role-based), exemplos positivos/negativos e delimitadores explícitos.
 * **Gestão de Custos & Latência:** Desvio precoce `(Fail)` para requisições inválidas, reduzindo o consumo de tokens na LLM principal.
+
+### ⚙️ Especificações Técnicas da LLM (OpenRouter)
+
+- **Provedor (Via OpenRouter):** Google (Gemini)
+- **Modelo Selecionado:** `google/gemini-1.5-pro` (ou `google/gemini-pro`)
+- **Temperatura:** `0.5` a `0.7` (Respostas determinísticas, sem variação criativa)
+- **Critério de Escolha:**
+  - **Capacidade de Raciocínio Complexo:** Alta precisão na detecção de nuances e manipulações indiretas (*Prompt Injection / Jailbreak*).
+  - **Aderência Rígida a Instruções:** Excelente acompanhamento de regras de formato e limites de escopo categóricos.
+  - **Janela de Contexto Expandida:** Capacidade de processar entradas longas de usuários sem perda de atenção nos guardrails.
+  - ** Utilização de Tokens do Provedor:** Menor que um centavo. Durante os testes foram feitos 41 `requests` e o gasto foi de **$0,33**
