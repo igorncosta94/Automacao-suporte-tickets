@@ -52,7 +52,7 @@ Este documento detalha o funcionamento, contratos de dados e regras operacionais
 - **Corpo:** Envia o HTML renderizado `{{ $json.resposta_cliente_html }}` com as orientações técnicas e solução direta estruturada pela IA.
 
 ### 4.2. Escalamento Executivo (`Enviar Email para Superior`)
-- **Gatilho:** Ativado caso o analista não consiga resolver o chamado crítico na raia de atendimento humano (`Resolvido = Não`)[cite: 9].
+- **Gatilho:** Ativado caso o analista não consiga resolver o chamado crítico na raia de atendimento humano (`Resolvido = Não`).
 - **Destinatário:** E-mail da gestão/supervisão de suporte.
 - **Objetivo:** Notificar a liderança para intervenção de Nível 2 / SLA estourado.
 
