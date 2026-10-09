@@ -118,7 +118,7 @@ O nó utiliza o sub-nó **Structured Output Parser** configurado no modo `Genera
   "resumo": "Câmera não conecta no Nvidia Broadcast",
   "impacto": "Cliente sem conseguir usar câmera",
   "tem_solucao": true,
-  "resposta_cliente_html": "<p>Olá Henrique,</p><p>Identifiquei que sua câmera não está conectando...</p><ol><li>Atualize o driver da câmera</li><li>Teste em outro aplicativo</li></ol>",
+  "resposta_cliente_html": "<p>Olá Igor,</p><p>Identifiquei que sua câmera não está conectando...</p><ol><li>Atualize o driver da câmera</li><li>Teste em outro aplicativo</li></ol>",
   "cliente_existente": true,
   "plano_cliente": "Enterprise"
 }
