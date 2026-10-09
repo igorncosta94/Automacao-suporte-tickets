@@ -22,15 +22,42 @@ O fluxo foi desenhado no **Bizagi Process Modeler**, separando claramente as res
 
 ## ⚙️ Arquitetura da Solução e Fluxo de Execução
 
-1. **Entrada e Guardrail de Segurança:** O processo é iniciado via Webhook. O conteúdo passa por um nó de verificação com **Gemini 3.1 Pro (via OpenRouter)** com filtros em duas camadas:
-   - **Camada 1 (Jailbreak Detection):** Bloqueio de injeção de prompt e manipulação de instrução.
-   - **Camada 2 (Topical Alignment):** Filtro de escopo estrito para suporte a software/SaaS.
-2. **Enriquecimento de Dados (*Data Enrichment*):** Consulta automática à base no Google Sheets para validar o cadastro do cliente e identificar o plano assinado (*Enterprise, Pro, Basic*).
-3. **Triagem por IA e Saída Estruturada:** O agente de IA analisa o chamado, classifica a urgência/categoria e gera a resposta técnica estruturada em JSON via `Structured Output Parser`.
-4. **Gestão Kanban (Trello):** Criação automática do card no Trello com etiquetas de prioridade e impacto.
-5. **Roteamento Inteligente (Gateways de Decisão):**
-   - **Fluxo Padrão (Não Urgente):** O cliente recebe um e-mail formatado em HTML com os passos de resolução e o card segue para aprovação.
-   - **Fluxo Crítico (Urgente):** Notificação em tempo real no **Slack** para atuação imediata do Analista de Suporte. Se o problema não for resolvido, um e-mail de escalamento é enviado para a gerência.
+![Fluxo Executado no n8n](assets/TriagemAutomacaoChamadosv3-n8n.png)
+
+Abaixo está o detalhamento de cada nó configurado no n8n e sua função operacional dentro do fluxo:
+
+---
+
+### 1. Entrada e Segurança
+* **`NovoTicket` (Webhook):** Ponto de entrada do sistema. Recebe o payload com os dados do chamado enviado pelo cliente (`data`, `nome`, `email`, `empresa`, `assunto`,`mensagem`).
+* **`Verificação` (Guardrail LLM - OpenRouter / Gemini 3.1 Pro):** Avalia a mensagem do cliente em duas camadas de proteção:
+  * **Jailbreak Detection:** Identifica tentativas de injeção de prompt ou manipulação do modelo.
+  * **Topical Alignment:** Garante que o assunto pertença estritamente ao escopo de suporte do SaaS.
+* **`Faça nada` (No Operation):** Caso a verificação falhe (`Fail`), o fluxo desvia para este nó e encerra a execução com segurança.
+
+---
+
+### 2. Enriquecimento de Dados & Processamento por IA
+* **`ConsultarBase` (Google Sheets):** Realiza o *Data Enrichment* buscando o e-mail do cliente na planilha de cadastro para injetar o tipo de plano (`Enterprise`, `Pro`, `Basic`) e validar se o cliente é existente.
+* **`AnaliseGravidade` (Agente de IA / Gemini 1.5 Pro):** Nó principal de inteligência artificial que recebe os dados enriquecidos e a mensagem do cliente. Analisa a gravidade, determina a categoria e gera a solução técnica direta.
+* **`Structured Output Parser`:** Sub-nó acoplado ao agente para forçar uma resposta estritamente em JSONSchema com os atributos: `categoria`, `prioridade`, `equipe`, `resumo`, `impacto`, `tem_solucao` e `resposta_cliente_html`.
+
+---
+
+### 3. Integração e Roteamento Kanban
+* **`CriarCard` (Trello):** Cria um novo card no quadro Kanban de suporte preenchendo o resumo, impacto, dados do cliente e aplicando etiquetas de categoria/prioridade.
+* **`Urgente` (If / Gateway):** Avalia se a prioridade calculada pela IA é urgente/crítica:
+  * **Caminho True (Urgente):** Direciona para o alerta imediato.
+  * **Caminho False (Padrão):** Envia para a régua regular de atendimento.
+
+---
+
+### 4. Notificações, Resoluções e Ações Finais
+* **`NotificaAnalista` (Slack):** Dispara notificação instantânea no canal de suporte crítico com o link do card no Trello para atendimento humano imediato.
+* **`NotificarEquipe` (Gmail/ Wait / Conditional):** Aguarda a validação do fluxo normal de atendimento.
+* **`Aprovado` (If / Gateway):** Avalia o status da aprovação do chamado:
+  * **Caminho True:** Executa o nó **`ResponderCliente`** (Gmail) enviando a solução em HTML para o cliente e move o card no Trello pelo nó **`ResolvidoIA`**.
+  * **Caminho False:** Move o card para auditoria/ajustes via nó **`AnaliseManual`**.
 
 ---
 
