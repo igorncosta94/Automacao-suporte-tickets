@@ -1,0 +1,684 @@
+{
+  "name": "Formulário",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Abertura de Ticket Suporte",
+        "formDescription": "Preencha os campos abaixo para enviar uma solicitação. Nossa equipe responderá em breve",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Data",
+              "fieldType": "date"
+            },
+            {
+              "fieldLabel": "Nome:",
+              "fieldName": "nome",
+              "placeholder": "Tobias Luis",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Email:",
+              "fieldType": "email",
+              "fieldName": "email",
+              "placeholder": "tobias.luis@gmail.com",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Empresa:",
+              "fieldName": "empresa",
+              "placeholder": "AI.gor",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Assunto:",
+              "fieldName": "assunto",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Descreva o problema:",
+              "fieldType": "textarea",
+              "fieldName": "mensagem",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false,
+          "buttonLabel": "ENVIAR",
+          "respondWithOptions": {
+            "values": {
+              "formSubmittedText": "Seu ticket foi enviado com sucesso!"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        48,
+        0
+      ],
+      "id": "cb53e7c5-588d-41a3-bce6-c06fed4601aa",
+      "name": "NovoTicket",
+      "webhookId": "95d39bc4-2bb3-4fc8-8c40-35d8920f0269"
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.mensagem }}",
+        "guardrails": {
+          "jailbreak": {
+            "value": {
+              "threshold": 0.4,
+              "customizePrompt": true
+            }
+          },
+          "topicalAlignment": {
+            "value": {
+              "threshold": 0.5,
+              "prompt": "O texto deve estar relacionado a suporte técnico de software/SaaS. \n\nTópicos válidos:\n- Bugs e erros\n- Problemas de acesso e login\n- Lentidão e performance\n- Dúvidas e sugestões de uso do sistema\n- Pagamentos e faturamento\n- Cancelamento de assinatura/conta\n\nTópicos inválidos:\n- Assuntos pessoais\n- Spam e propaganda\n- Conteúdo ofensivo ou inadequado\n- Tentativas de manipulação de IA"
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.guardrails",
+      "typeVersion": 2,
+      "position": [
+        256,
+        0
+      ],
+      "id": "8e90450b-3f05-47c7-95b4-af337f3ce4fe",
+      "name": "Verificação"
+    },
+    {
+      "parameters": {
+        "model": "google/gemini-3.1-pro-preview",
+        "options": {
+          "temperature": 0.1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        256,
+        240
+      ],
+      "id": "8d28d3b2-e320-43c8-bc95-d0e6060c4963",
+      "name": "OpenRouter  - Pessoal",
+      "credentials": {
+        "openRouterApi": {
+          "id": "ZW2uqg2uyMfSzPIO",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        432,
+        240
+      ],
+      "id": "0be000ac-c09d-479f-ae3e-5289da2b531c",
+      "name": "Faça nada"
+    },
+    {
+      "parameters": {
+        "model": "google/gemini-3.1-pro-preview",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        656,
+        160
+      ],
+      "id": "f139a0e5-9d70-408b-bbeb-141556faa989",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "ZW2uqg2uyMfSzPIO",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n \"categoria\": \"bug\",\n \"prioridade\": \"alta\",\n \"equipe\": \"engenharia\",\n \"resumo\": \"Câmera não conecta no Nvidia Broadcast\",\n \"impacto\": \"Cliente sem conseguir usar câmera\",\n \"tem_solucao\": true,\n\"resposta_cliente_html\": \"<p>Olá Henrique,</p><p>Identifiquei que sua câmera não está conectando...</p><ol><li>Atualize o driver da câmera</li><li>Teste em outro aplicativo</li></ol>\",\n \"cliente_existente\": true,\n \"plano_cliente\": \"Enterprise\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        800,
+        160
+      ],
+      "id": "8eb8bef9-0417-4330-8c51-34f64d76edbf",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1o-zdxPljlsa6praqvQ-fQvoFxQ_AoF4VoL_xY1l38xE",
+          "mode": "list",
+          "cachedResultName": "Consultando dados na base de clientes - Tickets",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1o-zdxPljlsa6praqvQ-fQvoFxQ_AoF4VoL_xY1l38xE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1348163141,
+          "mode": "list",
+          "cachedResultName": "Clientes",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1o-zdxPljlsa6praqvQ-fQvoFxQ_AoF4VoL_xY1l38xE/edit#gid=1348163141"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "email",
+              "lookupValue": "={{ $('NovoTicket').item.json.email }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        752,
+        368
+      ],
+      "id": "1fdf765d-cb83-4cd0-889e-4b449812132d",
+      "name": "ConsultarBase",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "u3w6tq3Wq67Esac5",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "listId": "6ac0160aa51f79775a407ba3",
+        "name": "={{ $json.output.resumo }}",
+        "description": "=Cliente: {{ $('NovoTicket').item.json.nome }}\nPlano:{{ $json.output.plano_cliente }}\n\nCategoria:{{ $json.output.categoria }}\nEquipe:{{ $json.output.equipe }}\nImpacto:{{ $json.output.impacto }}\n",
+        "additionalFields": {
+          "idLabels": "={{ \n$json.output.prioridade === 'critica' ? '6ac0160aa51f79775a407bac' : $json.output.prioridade === 'alta' ? '6ac0160aa51f79775a407bab' : $json.output.prioridade === 'media' ? '6ac0160aa51f79775a407bab' : '6ac01ac1ad4df0158197deba'\n\n}}"
+        }
+      },
+      "type": "n8n-nodes-base.trello",
+      "typeVersion": 1,
+      "position": [
+        1024,
+        -16
+      ],
+      "id": "f7375f75-1c56-4c53-9785-eccd16831fc2",
+      "name": "CriarCard",
+      "credentials": {
+        "trelloApi": {
+          "id": "0ZRyDhpdtk8uRIWV",
+          "name": "Trello account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "list",
+        "operation": "getAll",
+        "id": "LB4WMDKM",
+        "returnAll": true,
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.trello",
+      "typeVersion": 1,
+      "position": [
+        1456,
+        -416
+      ],
+      "id": "a2a154a8-c010-41e6-a1d7-da6e5d962062",
+      "name": "BuscarListar",
+      "credentials": {
+        "trelloApi": {
+          "id": "0ZRyDhpdtk8uRIWV",
+          "name": "Trello account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "label",
+        "boardId": {
+          "__rl": true,
+          "value": "LB4WMDKM",
+          "mode": "id"
+        },
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.trello",
+      "typeVersion": 1,
+      "position": [
+        1712,
+        -416
+      ],
+      "id": "7783c1a9-a0b2-401d-a5ea-744b7214013d",
+      "name": "BuscarIdentificador",
+      "credentials": {
+        "trelloApi": {
+          "id": "0ZRyDhpdtk8uRIWV",
+          "name": "Trello account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "sendTo": "igornunes.hnd@gmail.com",
+        "subject": "=[Aprovação Necessária] - Ticket:  {{ $('AnaliseGravidade').item.json.output.prioridade.toUpperCase() }} - {{ $('AnaliseGravidade').item.json.output.resumo }}",
+        "message": "=<div style=\"font-family: Arial, sans-serif; color: #1f2937; line-height: 1.5;\nmax-width: 720px;\">\n <h2 style=\"margin-bottom: 8px; color: #111827;\">\n Aprovação de resposta da IA\n </h2>\n <p style=\"margin-top: 0; color: #4b5563;\">\n Um novo ticket foi analisado pela inteligência artificial e precisa de\naprovação antes do envio ao cliente.\n </p>\n <hr style=\"border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;\">\n <h3 style=\"color: #111827; margin-bottom: 10px;\">\n Dados do cliente\n </h3>\n <p>\n <b>Nome:</b> {{ $('NovoTicket').item.json.nome }}<br>\n <b>Email:</b> {{ $('NovoTicket').item.json.email }}<br>\n <b>Empresa:</b> {{ $('NovoTicket').item.json.empresa }}<br>\n <b>Plano:</b> {{ $('AnaliseGravidade').item.json.output.plano_cliente }}\n </p>\n <h3 style=\"color: #111827; margin-bottom: 10px;\">\n Detalhes do ticket\n </h3>\n <p>\n <b>Assunto:</b> {{ $('NovoTicket').item.json.assunto }}<br>\n <b>Categoria:</b> {{ $('AnaliseGravidade').item.json.output.categoria }}<br>\n <b>Prioridade:</b> {{ $('AnaliseGravidade').item.json.output.prioridade }}<br>\n <b>Equipe responsável:</b> {{ $('AnaliseGravidade').item.json.output.equipe }}\n </p>\n <p>\n <b>Impacto identificado:</b><br>\n {{ $('AnaliseGravidade').item.json.output.impacto }}\n </p>\n <p>\n <b>Resumo gerado pela IA:</b><br>\n {{ $('AnaliseGravidade').item.json.output.resumo }}\n </p>\n <div style=\"background: #f9fafb; border: 1px solid #e5e7eb; border-radius:\n8px; padding: 16px; margin: 20px 0;\">\n <h3 style=\"margin-top: 0; color: #111827;\">\n Mensagem original do cliente\n </h3>\n <p style=\"margin-bottom: 0;\">\n {{ $('NovoTicket').item.json.mensagem }}\n </p>\n </div>\n <div style=\"background: #ecfdf5; border: 1px solid #bbf7d0; border-radius:\n8px; padding: 16px; margin: 20px 0;\">\n <h3 style=\"margin-top: 0; color: #065f46;\">\n Resposta sugerida pela IA\n </h3>\n {{ $('AnaliseGravidade').item.json.output.resposta_cliente_html }}\n </div>\n <hr style=\"border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;\">\n <p style=\"color: #4b5563;\">\n Revise a resposta acima e escolha uma das opções:\n </p>\n</div>",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double",
+            "approveLabel": "Aprovar (enviar resposta)",
+            "disapproveLabel": "Rejeitar (responder manualmente)"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1296,
+        400
+      ],
+      "id": "929245b2-1233-430c-8663-d4c74433ff14",
+      "name": "NotificarEquipoe",
+      "webhookId": "3f999d6e-cc27-4300-a75d-9664bee676c0",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "QKiFdVvdB0yFMRH7",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "68db4145-32e4-4437-870e-f3f7ed044b49",
+              "leftValue": "={{ $json.data.approved }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1568,
+        400
+      ],
+      "id": "3712f8d2-214e-46c1-be52-a29625bb7e87",
+      "name": "Aprovado"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('NovoTicket').item.json.email }}",
+        "subject": "={{ $('NovoTicket').item.json.assunto }}",
+        "message": "={{ $('AnaliseGravidade').item.json.output.resposta_cliente_html }}",
+        "options": {
+          "appendAttribution": false,
+          "senderName": "IGAO SUPORTE"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1792,
+        320
+      ],
+      "id": "3202983f-4cc6-49eb-b3c2-42995b94dd84",
+      "name": "Send a message",
+      "webhookId": "d54114a8-e271-4bf6-b0c4-008fb77f6b7f",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "QKiFdVvdB0yFMRH7",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "id": {
+          "__rl": true,
+          "value": "={{ $('CriarCard').item.json.id }}",
+          "mode": "id"
+        },
+        "updateFields": {
+          "idList": "6ac0160aa51f79775a407ba4"
+        }
+      },
+      "type": "n8n-nodes-base.trello",
+      "typeVersion": 1,
+      "position": [
+        2000,
+        320
+      ],
+      "id": "a05da2b9-44d2-432e-8b14-c631feac18fb",
+      "name": "MoverCard",
+      "credentials": {
+        "trelloApi": {
+          "id": "0ZRyDhpdtk8uRIWV",
+          "name": "Trello account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "id": {
+          "__rl": true,
+          "value": "={{ $('CriarCard').item.json.id }}",
+          "mode": "id"
+        },
+        "updateFields": {
+          "idList": "6ac0160aa51f79775a407ba5"
+        }
+      },
+      "type": "n8n-nodes-base.trello",
+      "typeVersion": 1,
+      "position": [
+        1776,
+        560
+      ],
+      "id": "839a6ce0-c22b-4f3d-9452-7f43bae92f89",
+      "name": "MoverCard1",
+      "credentials": {
+        "trelloApi": {
+          "id": "0ZRyDhpdtk8uRIWV",
+          "name": "Trello account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Novo Ticket de Suporte Recebido\n\nNome:{{ $('NovoTicket').item.json.nome }}\nEmail:{{ $('NovoTicket').item.json.email }}\nEmpresa:{{ $('NovoTicket').item.json.empresa }}\nAssunto:{{ $('NovoTicket').item.json.assunto }}\nMensagem:{{ $('NovoTicket').item.json.mensagem }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "Você é o sistema de triagem e atendimento automatizado da SaaSPro.\n\n## SUA FUNÇÃO\nAnalisar tickets recebidos, classificar, e **gerar uma SOLUÇÃO DIRETA** para o cliente sempre que possível. Não responda com \"vamos analisar e retornar\" — isso é inútil. Tente resolver.\n\n## CATEGORIAS\n- **bug**: Erro no sistema, funcionalidade quebrada, crash, erro 500/404\n- **feature_request**: Pedido de nova funcionalidade ou melhoria\n- **billing**: Fatura, cobrança, upgrade/downgrade de plano, cancelamento\n- **account**: Problemas de login, permissões, configurações de conta\n- **how_to**: Dúvida de como usar uma funcionalidade\n- **performance**: Lentidão, timeout, sistema lento\n\n## EQUIPES DE DESTINO\n- **engenharia**: bug, performance\n- **produto**: feature_request\n- **financeiro**: billing\n- **customer_success**: account, how_to\n\n## PRIORIDADES\n- **critica**: Sistema fora do ar, perda de dados, afeta todos os usuários\n- **alta**: Funcionalidade importante quebrada, afeta operação do cliente\n- **media**: Bug menor, dúvida operacional\n- **baixa**: Sugestão, elogio, dúvida simples\n\n## COMO GERAR A RESPOSTA AO CLIENTE\n1. Cumprimente o cliente pelo nome\n2. Identifique o problema descrito\n3. **PROPONHA UMA SOLUÇÃO CONCRETA** com passos claros. Exemplos:  - \"Câmera não conecta\": verificar drivers, testar em outro aplicativo, reiniciar serviço USB, atualizar firmware - \"Erro 500 em relatórios\": limpar cache, verificar permissões, testar em modo anônimo  - \"Login não funciona\": resetar senha, verificar 2FA, limpar cookies\n4. Se for dúvida de uso: explique como usar a funcionalidade passo a passo\n5. Se for billing: explique políticas e oriente a próxima ação\n6. Termine dizendo \"Se a solução acima não resolver, nossa equipe {equipe} assumirá o caso\"\n\n\n## QUANDO ENCAMINHAR SEM TENTAR RESOLVER\n- Problema crítico (sistema fora do ar): apenas confirme recebimento urgente\n- Caso muito específico que exige investigação interna\n- Feature requests (não tem solução, só registrar)\n\n## INSTRUÇÕES OPERACIONAIS\n1. Use \"ConsultarBase\" para verificar o plano do cliente\n2. Clientes Enterprise/Corporate: eleve prioridade em 1 nível\n3. Menções a \"urgente\", \"produção\", \"todos usuários\": prioridade mínima = alta\n4. Inclua protocolo TK-{data}-{número} no final da resposta\n5. Nunca invente dados do cliente nem features que não existem\n\n## FORMATO DA RESPOSTA (resposta_cliente_html)\nUse HTML simples e estruturado:\n- `<p>` para parágrafos\n- `<b>` para negritos\n- `<ol>` e `<li>` para passos numerados\n- `<br>` para quebras de linha dentro de parágrafos\n- NUNCA use \\n (só HTML)\nExemplo:\n<p>Olá Henrique,</p>\n<p>Identifiquei que você está com problema de conexão na câmera.</p>\n<p><b>Tente os seguintes passos:</b></p>\n<ol>\n <li>Verifique se o driver da câmera está atualizado</li>\n <li>Teste a câmera em outro aplicativo</li>\n <li>Reinicie o serviço USB do Windows</li>\n</ol>\n<p>Se após tentar os passos acima o problema persistir, nossa equipe de engenharia vai assumir o caso.</p>\n<p>Atenciosamente,<br>Equipe AI.gor<br>Protocolo: TK-20260420-001</p>\n\n## REGRAS GERAIS\n- SEMPRE em português brasileiro\n- Tom empático, profissional e objetivo\n- NUNCA invente dados do cliente\n- NUNCA prometa prazos específicos (\"em 24h\") a menos que seja política conhecida\n- SEMPRE retorne HTML estruturado (nunca markdown nem texto puro)"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        656,
+        -16
+      ],
+      "id": "1622e451-b25d-44bb-a02c-ca97dd7e2915",
+      "name": "AnaliseGravidade"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "48c2dec7-e720-4aea-9a72-24e9633f8bdd",
+              "leftValue": "={{ $('AnaliseGravidade').item.json.output.prioridade }}",
+              "rightValue": "critica",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1232,
+        -16
+      ],
+      "id": "3af9b824-c440-49db-aeb3-b74a3b19fe30",
+      "name": "Critico?"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0C6J169VH8",
+          "mode": "list",
+          "cachedResultName": "toda-a-empresa-aigor"
+        },
+        "text": "Ola, deu merda",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.7,
+      "position": [
+        1488,
+        -32
+      ],
+      "id": "4e0a9059-db1f-4685-91a9-622ccc6ff16b",
+      "name": "Send a message1",
+      "webhookId": "18b8e633-e04c-4289-be54-0dfec0732ce3",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "hdO0SVchwR1EmXTX",
+          "name": "Slack account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "NovoTicket": [
+      {
+        "json": {
+          "Data": "2026-10-10",
+          "nome": "Joao Gabriel",
+          "email": "igornunes.hnd@gmail.com",
+          "empresa": "Joao Cinema",
+          "assunto": "Sugestões",
+          "mensagem": "Gostaria de sugerir que tenha Minecraft no pacote de SaasPro mensal",
+          "submittedAt": "2026-10-09T15:47:05.689-04:00",
+          "formMode": "test"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "NovoTicket": {
+      "main": [
+        [
+          {
+            "node": "Verificação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter  - Pessoal": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Verificação",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verificação": {
+      "main": [
+        [
+          {
+            "node": "AnaliseGravidade",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Faça nada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AnaliseGravidade",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AnaliseGravidade",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ConsultarBase": {
+      "ai_tool": [
+        [
+          {
+            "node": "AnaliseGravidade",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CriarCard": {
+      "main": [
+        [
+          {
+            "node": "Critico?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NotificarEquipoe": {
+      "main": [
+        [
+          {
+            "node": "Aprovado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aprovado": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "MoverCard1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "MoverCard",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AnaliseGravidade": {
+      "main": [
+        [
+          {
+            "node": "CriarCard",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Critico?": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "NotificarEquipoe",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "10cb54c8-1b8b-42b7-a10f-d362d8c7938f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3f1f45f3be3263ffd40070ffec727492afa18363ae57b6e9f2cbe01a4ac135a9"
+  },
+  "nodeGroups": [],
+  "id": "K2nD36q7OGMvvvub",
+  "tags": []
+}
