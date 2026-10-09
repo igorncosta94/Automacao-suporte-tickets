@@ -69,10 +69,11 @@ Tópicos inválidos:
 ### ⚙️ Especificações Técnicas da LLM (OpenRouter)
 
 - **Provedor (Via OpenRouter):** Google (Gemini)
-- **Modelo Selecionado:** `google/gemini-1.5-pro` (ou `google/gemini-pro`)
+- **Modelo Selecionado:** `google/gemini-3.1-pro`
 - **Temperatura:** `0.5` a `0.7` (Respostas determinísticas, sem variação criativa)
 - **Critério de Escolha:**
   - **Capacidade de Raciocínio Complexo:** Alta precisão na detecção de nuances e manipulações indiretas (*Prompt Injection / Jailbreak*).
   - **Aderência Rígida a Instruções:** Excelente acompanhamento de regras de formato e limites de escopo categóricos.
   - **Janela de Contexto Expandida:** Capacidade de processar entradas longas de usuários sem perda de atenção nos guardrails.
   - ** Utilização de Tokens do Provedor:** Menor que um centavo. Durante os testes foram feitos 41 `requests` e o gasto foi de **$0,33**
+ 
